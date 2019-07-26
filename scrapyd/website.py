@@ -205,7 +205,7 @@ class Jobs(resource.Resource):
                 Items='<a href="/items/%s/%s/%s.jl">Items</a>' % (p.project, p.spider, p.job),
                 Cancel=self.cancel_button(project=p.project, jobid=p.job)
             ))
-            for p in self.root.launcher.processes.values()
+            for p in self.root.launcher.jobs.get_jobs_runing()
         )
 
     def prep_tab_finished(self):
@@ -219,7 +219,7 @@ class Jobs(resource.Resource):
                 Log='<a href="/logs/%s/%s/%s.log">Log</a>' % (p.project, p.spider, p.job),
                 Items='<a href="/items/%s/%s/%s.jl">Items</a>' % (p.project, p.spider, p.job),
             ))
-            for p in self.root.launcher.finished
+            for p in self.root.launcher.jobs.get_jobs_completed()
         )
 
     def render(self, txrequest):

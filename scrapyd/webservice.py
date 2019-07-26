@@ -30,8 +30,8 @@ class DaemonStatus(WsResource):
 
     def render_GET(self, txrequest):
         pending = sum(q.count() for q in self.root.poller.queues.values())
-        running = len(self.root.launcher.processes)
-        finished = len(self.root.launcher.finished)
+        running = len(self.root.launcher.jobs.get_jobs_runing())
+        finished = len(self.root.launcher.jobs.get_jobs_completed())
 
         return {"node_name": self.root.nodename, "status":"ok", "pending": pending, "running": running, "finished": finished}
 
@@ -70,7 +70,7 @@ class Cancel(WsResource):
         c = queue.remove(lambda x: x["_job"] == jobid)
         if c:
             prevstate = "pending"
-        spiders = self.root.launcher.processes.values()
+        spiders = self.root.launcher.jobs.get_jobs_runing()
         for s in spiders:
             if s.project == project and s.job == jobid:
                 s.transport.signalProcess(signal)
@@ -119,7 +119,8 @@ class ListJobs(WsResource):
     def render_GET(self, txrequest):
         args = native_stringify_dict(copy(txrequest.args), keys_only=False)
         project = args.get('project', [None])[0]
-        spiders = self.root.launcher.processes.values()
+        completed = self.root.launcher.jobs.get_jobs_completed()
+        running = self.root.launcher.jobs.get_jobs_runing()
         queues = self.root.poller.queues
         pending = [
             {"project": qname, "spider": x["name"], "id": x["_job"]}
@@ -132,7 +133,7 @@ class ListJobs(WsResource):
                 "spider": s.spider,
                 "id": s.job, "pid": s.pid,
                 "start_time": str(s.start_time),
-            } for s in spiders if project is None or s.project == project
+            } for s in running if project is None or s.project == project
         ]
         finished = [
             {
@@ -140,7 +141,7 @@ class ListJobs(WsResource):
                 "spider": s.spider, "id": s.job,
                 "start_time": str(s.start_time),
                 "end_time": str(s.end_time)
-            } for s in self.root.launcher.finished
+            } for s in completed
             if project is None or s.project == project
         ]
         return {"node_name": self.root.nodename, "status": "ok",

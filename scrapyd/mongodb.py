@@ -82,14 +82,17 @@ class MongoDBJobs(MongoConnector):
     def __len__(self):
         return self.collection.count()
 
-    def __iter__(self):
-        queryset = self.collection.find().sort([
+    def get_jobs_runing(self):
+        queryset = self.collection.find({'end_time': None}).sort([
             ('start_time', pymongo.DESCENDING),
         ])
         return iter([JobItem(q) for q in queryset])
 
-    def values(self):
-        return self.__iter__()
+    def get_jobs_completed(self):
+        queryset = self.collection.find({'end_time': {'$ne': None}}).sort([
+            ('start_time', pymongo.DESCENDING),
+        ])
+        return iter([JobItem(q) for q in queryset])
 
     def encode(self, obj):
         return json.dumps(obj)

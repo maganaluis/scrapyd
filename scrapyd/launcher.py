@@ -17,8 +17,7 @@ class Launcher(Service):
 
     def __init__(self, config, app):
         self.mem_processes = {}
-        self.finished = MongoDBJobs(config, 'jobs')
-        self.processes = MongoDBJobs(config, 'jobs')
+        self.jobs = MongoDBJobs(config, 'jobs')
         self.finished_to_keep = config.getint('finished_to_keep', 100)
         self.max_proc = self._get_max_proc(config)
         self.runner = config.get('runner', 'scrapyd.runner')
@@ -48,12 +47,12 @@ class Launcher(Service):
         pp.deferred.addBoth(self._process_finished, slot)
         reactor.spawnProcess(pp, sys.executable, args=args, env=env)
         self.mem_processes[slot] = pp
-        self.processes.insert(pp)
+        self.jobs.insert(pp)
 
     def _process_finished(self, _, slot):
         process = self.mem_processes.pop(slot)
         process.end_time = datetime.now()
-        self.finished.update(process)
+        self.jobs.update(process)
         self._wait_for_project(slot)
 
     def _get_max_proc(self, config):
