@@ -9,7 +9,7 @@ import json
 from twisted.web import resource
 
 from scrapyd.spiderqueue import SqliteSpiderQueue
-from scrapyd.spiderqueue import MongoDBPriorityQueue
+from scrapyd.spiderqueue import MongoDBSpiderQueue
 from scrapyd.config import Config
 
 
