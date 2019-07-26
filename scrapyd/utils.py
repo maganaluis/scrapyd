@@ -9,6 +9,7 @@ import json
 from twisted.web import resource
 
 from scrapyd.spiderqueue import SqliteSpiderQueue
+from scrapyd.spiderqueue import MongoDBPriorityQueue
 from scrapyd.config import Config
 
 
@@ -52,15 +53,12 @@ class UtilsCache:
         self.cache_manager[key] = value
 
 def get_spider_queues(config):
-    """Return a dict of Spider Queues keyed by project name"""
-    dbsdir = config.get('dbs_dir', 'dbs')
-    if not os.path.exists(dbsdir):
-        os.makedirs(dbsdir)
-    d = {}
+    """Return a dict of Spider Quees keyed by project name"""
+    queues = {}
     for project in get_project_list(config):
-        dbpath = os.path.join(dbsdir, '%s.db' % project)
-        d[project] = SqliteSpiderQueue(dbpath)
-    return d
+        collection = '{}_queue'.format(project)
+        queues[project] = MongoDBSpiderQueue(config, collection)
+    return queues
 
 def get_project_list(config):
     """Get list of projects by inspecting the eggs dir and the ones defined in

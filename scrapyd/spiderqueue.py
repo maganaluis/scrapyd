@@ -2,9 +2,10 @@ from zope.interface import implementer
 
 from scrapyd.interfaces import ISpiderQueue
 from scrapyd.sqlite import JsonSqlitePriorityQueue
+from .mongodb import MongoDBPriorityQueue
 
 
-@implementer(ISpiderQueue)
+#@implementer(ISpiderQueue)
 class SqliteSpiderQueue(object):
 
     def __init__(self, database=None, table='spider_queue'):
@@ -29,3 +30,8 @@ class SqliteSpiderQueue(object):
 
     def clear(self):
         self.q.clear()
+
+@implementer(ISpiderQueue)
+class MongoDBSpiderQueue(SqliteSpiderQueue):
+    def __init__(self, config, collection):
+        self.q = MongoDBPriorityQueue(config, collection)
