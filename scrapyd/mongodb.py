@@ -3,7 +3,7 @@ import pymongo
 from configparser import NoOptionError
 
 class JobItem(object):
-    def __init__(item):
+    def __init__(self, item):
         self.project = item['project']
         self.spider = item['spider']
         self.job = item['job']
@@ -62,7 +62,14 @@ class MongoDBJobs(MongoConnector):
 
     def update(self, item):
         result = self.collection.update_one({'id': item.job},
-        {'$set': item}, upsert=True)
+        {'$set': {
+            "project": item.project,
+            "spider": item.spider,
+            "id": item.job,
+            "pid": item.pid,
+            "start_time": str(item.start_time),
+            "end_time": str(item.end_time)
+        }}, upsert=True)
         return result
 
     def remove(self, item):
