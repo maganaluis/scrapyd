@@ -11,6 +11,7 @@ class JobItem(object):
         self.start_time = item['start_time']
         self.end_time = item['end_time']
 
+
 class MongoConnector(object):
     def __init__(self, config, collection):
         database_name = config.get('mongodb_name', 'scrapyd_mongodb')
@@ -55,8 +56,8 @@ class MongoDBJobs(MongoConnector):
             "spider": item.spider,
             "id": item.job,
             "pid": item.pid,
-            "start_time": str(item.start_time),
-            "end_time": str(item.end_time)
+            "start_time": item.start_time,
+            "end_time": item.end_time
         })
         return result
 
@@ -67,8 +68,8 @@ class MongoDBJobs(MongoConnector):
             "spider": item.spider,
             "id": item.job,
             "pid": item.pid,
-            "start_time": str(item.start_time),
-            "end_time": str(item.end_time)
+            "start_time": item.start_time,
+            "end_time": item.end_time
         }}, upsert=True)
         return result
 
