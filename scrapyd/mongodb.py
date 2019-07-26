@@ -6,7 +6,7 @@ class JobItem(object):
     def __init__(self, item):
         self.project = item['project']
         self.spider = item['spider']
-        self.job = item['job']
+        self.job = item['id']
         self.pid = item['pid']
         self.start_time = item['start_time']
         self.end_time = item['end_time']
