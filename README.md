@@ -1,4 +1,4 @@
-### Forked Verions Notes
+### Forked Verion Notes
 
 This forked version writes the job information to mongodb. In order to use it simply add
 the mongo db connection information to you config file: 
