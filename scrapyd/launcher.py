@@ -9,14 +9,16 @@ from twisted.python import log
 from scrapyd.utils import get_crawl_args, native_stringify_dict
 from scrapyd import __version__
 from .interfaces import IPoller, IEnvironment
+from .mongodb import MongoDBJobs
 
 class Launcher(Service):
 
     name = 'launcher'
 
     def __init__(self, config, app):
-        self.processes = {}
-        self.finished = []
+        self.mem_processes = {}
+        self.finished = MongoDBJobs(config, 'jobs')
+        self.processes = MongoDBJobs(config, 'jobs')
         self.finished_to_keep = config.getint('finished_to_keep', 100)
         self.max_proc = self._get_max_proc(config)
         self.runner = config.get('runner', 'scrapyd.runner')
