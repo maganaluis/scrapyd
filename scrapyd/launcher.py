@@ -47,13 +47,13 @@ class Launcher(Service):
             msg['_job'], env)
         pp.deferred.addBoth(self._process_finished, slot)
         reactor.spawnProcess(pp, sys.executable, args=args, env=env)
-        self.processes[slot] = pp
+        self.mem_processes[slot] = pp
+        self.processes.insert(pp)
 
     def _process_finished(self, _, slot):
-        process = self.processes.pop(slot)
+        process = self.mem_processes.pop(slot)
         process.end_time = datetime.now()
-        self.finished.append(process)
-        del self.finished[:-self.finished_to_keep] # keep last 100 finished jobs
+        self.finished.update(process)
         self._wait_for_project(slot)
 
     def _get_max_proc(self, config):
