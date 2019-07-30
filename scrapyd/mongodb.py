@@ -38,7 +38,7 @@ class MongoConnector(object):
                 )
 
             self.collection = self.conn.get_database(database_name)[collection]
-        self.instance = None
+        instance = None
         def __new__(cls): # __new__ always a classmethod
             if not MongoConnector.MongoConnector:
                 MongoConnector.instance = MongoConnector.__MongoConnector()
