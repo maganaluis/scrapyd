@@ -13,30 +13,40 @@ class JobItem(object):
 
 
 class MongoConnector(object):
-    def __init__(self, config, collection):
-        database_name = config.get('mongodb_name', 'scrapyd_mongodb')
-        database_host = config.get('mongodb_host', 'localhost')
-        database_port = config.getint('mongodb_port', 27017)
-        database_user = self.get_optional_config(config, 'mongodb_user')
-        database_pwd = self.get_optional_config(config, 'mongodb_pass')
-        if database_user and database_pwd:
-            conn_str = (
-                'mongodb://{db_user}:{db_pwd}@{db_host}:{db_port}/{db_name}'
-            ).format(
-                db_user=database_user,
-                db_pwd=database_pwd,
-                db_host=database_host,
-                db_port=database_port,
-                db_name=database_name,
-            )
-            self.conn = pymongo.MongoClient(conn_str)
-        else:
-            self.conn = pymongo.MongoClient(
-                host=database_host,
-                port=database_port,
-            )
+    class __MongoConnector:
+        def __init__(self, config, collection):
+            database_name = config.get('mongodb_name', 'scrapyd_mongodb')
+            database_host = config.get('mongodb_host', 'localhost')
+            database_port = config.getint('mongodb_port', 27017)
+            database_user = self.get_optional_config(config, 'mongodb_user')
+            database_pwd = self.get_optional_config(config, 'mongodb_pass')
+            if database_user and database_pwd:
+                conn_str = (
+                    'mongodb://{db_user}:{db_pwd}@{db_host}:{db_port}/{db_name}'
+                ).format(
+                    db_user=database_user,
+                    db_pwd=database_pwd,
+                    db_host=database_host,
+                    db_port=database_port,
+                    db_name=database_name,
+                )
+                self.conn = pymongo.MongoClient(conn_str)
+            else:
+                self.conn = pymongo.MongoClient(
+                    host=database_host,
+                    port=database_port,
+                )
 
-        self.collection = self.conn.get_database(database_name)[collection]
+            self.collection = self.conn.get_database(database_name)[collection]
+        self.instance = None
+        def __new__(cls): # __new__ always a classmethod
+            if not MongoConnector.MongoConnector:
+                MongoConnector.instance = MongoConnector.__MongoConnector()
+            return MongoConnector.instance
+        def __getattr__(self, name):
+            return getattr(self.instance, name)
+        def __setattr__(self, name):
+            return setattr(self.instance, name)
 
     @staticmethod
     def get_optional_config(config, name):

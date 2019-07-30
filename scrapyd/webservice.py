@@ -30,8 +30,8 @@ class DaemonStatus(WsResource):
 
     def render_GET(self, txrequest):
         pending = sum(q.count() for q in self.root.poller.queues.values())
-        running = len(self.root.launcher.jobs.get_jobs_runing())
-        finished = len(self.root.launcher.jobs.get_jobs_completed())
+        running = len(self.root.launcher.jobs.get_jobs_runing()) #TODO
+        finished = len(self.root.launcher.jobs.get_jobs_completed()) #TODO
 
         return {"node_name": self.root.nodename, "status":"ok", "pending": pending, "running": running, "finished": finished}
 
@@ -53,12 +53,13 @@ class Schedule(WsResource):
         args['settings'] = settings
         jobid = args.pop('jobid', uuid.uuid1().hex)
         args['_job'] = jobid
-        print(jobid)
         self.root.scheduler.schedule(project, spider, priority=priority, **args)
         return {"node_name": self.root.nodename, "status": "ok", "jobid": jobid}
 
 class Cancel(WsResource):
-
+    """
+    This doesn't currently work with MONGODB
+    """
     def render_POST(self, txrequest):
         args = dict((k, v[0])
                     for k, v in native_stringify_dict(copy(txrequest.args),
