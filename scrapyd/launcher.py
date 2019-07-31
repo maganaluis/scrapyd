@@ -17,6 +17,7 @@ class Launcher(Service):
 
     def __init__(self, config, app):
         self.mem_processes = {}
+        self.mem_storage = [] #failsafe for spawnProcess
         self.jobs = MongoDBJobs(config, 'jobs')
         self.finished_to_keep = config.getint('finished_to_keep', 100)
         self.max_proc = self._get_max_proc(config)
@@ -32,9 +33,14 @@ class Launcher(Service):
 
     def _wait_for_project(self, slot):
         poller = self.app.getComponent(IPoller)
-        poller.next().addCallback(self._spawn_process, slot)
+        if not self.mem_storage:
+            poller.next().addCallback(self._spawn_process, slot)
+        else:
+            message = self.mem_storage.pop()
+            self._spawn_process(message, slot)
 
     def _spawn_process(self, message, slot):
+        self.mem_storage.append(message)
         msg = native_stringify_dict(message, keys_only=False)
         project = msg['_project']
         args = [sys.executable, '-m', self.runner, 'crawl']
@@ -48,6 +54,7 @@ class Launcher(Service):
         reactor.spawnProcess(pp, sys.executable, args=args, env=env)
         self.mem_processes[slot] = pp
         self.jobs.insert(pp)
+        self.mem_storage.pop()
 
     def _process_finished(self, _, slot):
         process = self.mem_processes.pop(slot)
