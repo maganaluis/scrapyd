@@ -10,7 +10,7 @@ class JobItem(object):
         self.pid = item['pid']
         self.start_time = item['start_time']
         self.end_time = item['end_time']
-        
+
 
 class MongoConnector(object):
     def __init__(self, config, collection):
@@ -34,7 +34,8 @@ class MongoConnector(object):
             self.conn = pymongo.MongoClient(
                 host=database_host,
                 port=database_port,
-            )
+                maxPoolSize=1000,
+                retryWrites=True)
 
         self.collection = self.conn.get_database(database_name)[collection]
 

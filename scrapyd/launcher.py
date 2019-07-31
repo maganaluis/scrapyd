@@ -62,7 +62,7 @@ class Launcher(Service):
                 cpus = cpu_count()
             except NotImplementedError:
                 cpus = 1
-            max_proc = cpus * config.getint('max_proc_per_cpu', 4)
+            max_proc = cpus * config.getint('max_proc_per_cpu', 2)
         return max_proc
 
 class ScrapyProcessProtocol(protocol.ProcessProtocol):
