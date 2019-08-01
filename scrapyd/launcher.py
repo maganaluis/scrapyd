@@ -11,10 +11,6 @@ from scrapyd import __version__
 from .interfaces import IPoller, IEnvironment
 from .mongodb import MongoDBJobs
 
-from twisted.python.logfile import DailyLogFile
-
-log.startLogging(open('/var/log/launcher.log', 'w'))
-
 class Launcher(Service):
 
     name = 'launcher'
