@@ -13,7 +13,7 @@ from .mongodb import MongoDBJobs
 
 from twisted.python.logfile import DailyLogFile
 
-log.startLogging(DailyLogFile.fromFullPath("launcher.log"))
+log.startLogging(open('/var/log/launcher.log', 'w'))
 
 class Launcher(Service):
 
