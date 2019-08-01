@@ -11,17 +11,16 @@ from scrapyd import __version__
 from .interfaces import IPoller, IEnvironment
 from .mongodb import MongoDBJobs
 
-import logging
+import os
 import socket
 
-logging.basicConfig(
-    handlers=[
-        logging.FileHandler("/data/{hostname}-launcher.log".format(hostname=socket.gethostname())),
-        logging.StreamHandler()
-    ])
-
-observer = log.PythonLoggingObserver(loggerName=__name__)
-observer.start()
+class LocalLogger:
+    def __init__(self):
+        self.file_name = "{host}-launcher.log".format(host=socket.gethostname())
+        self.path = "/data/"
+    def write(self, message):
+        with open(os.path.join(self.path, self.file_name), 'a+') as f:
+            f.write("{time}: {msg} \n".format(str(datetime.now()), message))
 
 class Launcher(Service):
 
@@ -35,6 +34,7 @@ class Launcher(Service):
         self.max_proc = self._get_max_proc(config)
         self.runner = config.get('runner', 'scrapyd.runner')
         self.app = app
+        self.logger_local = LocalLogger()
 
     def startService(self):
         for slot in range(self.max_proc):
@@ -46,7 +46,10 @@ class Launcher(Service):
     def _wait_for_project(self, slot):
         poller = self.app.getComponent(IPoller)
         if not self.mem_storage:
-            poller.next().addCallback(self._spawn_process, slot)
+            try:
+                poller.next().addCallback(self._spawn_process, slot)
+            except Exception as e:
+                self.logger_local.write(e)
         else:
             message = self.mem_storage.pop()
             self._spawn_process(message, slot)
