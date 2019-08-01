@@ -11,7 +11,17 @@ from scrapyd import __version__
 from .interfaces import IPoller, IEnvironment
 from .mongodb import MongoDBJobs
 
-log.startLogging(open('launcher.log', 'w+'))
+import logging
+import socket
+
+logging.basicConfig(
+    handlers=[
+        logging.FileHandler("/data/{hostname}-launcher.log".format(hostname=socket.gethostname())),
+        logging.StreamHandler()
+    ])
+
+observer = log.PythonLoggingObserver(loggerName=__name__)
+observer.start()
 
 class Launcher(Service):
 
