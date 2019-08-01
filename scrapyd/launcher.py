@@ -4,12 +4,17 @@ from multiprocessing import cpu_count
 
 from twisted.internet import reactor, defer, protocol, error
 from twisted.application.service import Service
-from twisted.python import log
 
 from scrapyd.utils import get_crawl_args, native_stringify_dict
 from scrapyd import __version__
 from .interfaces import IPoller, IEnvironment
 from .mongodb import MongoDBJobs
+
+import io
+from twisted.logger import jsonFileLogObserver, Logger
+
+log = Logger(observer=jsonFileLogObserver(io.open("launcher-log.json", "a")),
+             namespace="saver")
 
 class Launcher(Service):
 
