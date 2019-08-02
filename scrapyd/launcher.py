@@ -18,8 +18,8 @@ class Launcher(Service):
     def __init__(self, config, app):
         self.mem_processes = {}
         self.mem_storage = [] #failsafe for spawnProcess
-        self.jobs = MongoDBJobs(config, 'jobs')
         self.finished_to_keep = config.getint('finished_to_keep', 100)
+        self.jobs = MongoDBJobs(config, 'jobs', keep=self.finished_to_keep)
         self.max_proc = self._get_max_proc(config)
         self.runner = config.get('runner', 'scrapyd.runner')
         self.app = app
