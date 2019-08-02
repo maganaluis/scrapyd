@@ -47,7 +47,7 @@ class MongoConnector(object):
             return None
 
 class MongoDBJobs(MongoConnector):
-    def __init__(self, config, collection, int keep=5000):
+    def __init__(self, config, collection, keep=5000):
         super().__init__(config, collection)
         self.collection.create_index("start_time")
         self.keep = int(keep)
