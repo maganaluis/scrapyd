@@ -63,7 +63,7 @@ class MongoDBJobs(MongoConnector):
         })
         if len(self) > self.keep:
             to_delete =  self.collection.find_one({}, sort=[
-                ('start_time', pymongo.DESCENDING),
+                ('start_time', pymongo.ASCENDING),
             ])
             self.collection.delete_one({'_id': to_delete['_id']})
         return result
