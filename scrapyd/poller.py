@@ -15,8 +15,6 @@ class QueuePoller(object):
 
     @inlineCallbacks
     def poll(self):
-        if not self.dq.waiting:
-            return
         for p, q in iteritems(self.queues):
             c = yield maybeDeferred(q.count)
             if c:

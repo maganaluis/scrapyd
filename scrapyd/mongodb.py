@@ -34,7 +34,8 @@ class MongoConnector(object):
             self.conn = pymongo.MongoClient(
                 host=database_host,
                 port=database_port,
-            )
+                maxPoolSize=1000,
+                retryWrites=True)
 
         self.collection = self.conn.get_database(database_name)[collection]
 
@@ -46,9 +47,10 @@ class MongoConnector(object):
             return None
 
 class MongoDBJobs(MongoConnector):
-    def __init__(self, config, collection):
+    def __init__(self, config, collection, keep=5000):
         super().__init__(config, collection)
-        self.collection.create_index("id", unique=True)
+        self.collection.create_index("start_time")
+        self.keep = int(keep)
 
     def insert(self, item):
         result = self.collection.insert_one({
@@ -59,6 +61,11 @@ class MongoDBJobs(MongoConnector):
             "start_time": item.start_time,
             "end_time": item.end_time
         })
+        if len(self) > self.keep:
+            to_delete =  self.collection.find_one({}, sort=[
+                ('start_time', pymongo.ASCENDING),
+            ])
+            self.collection.delete_one({'_id': to_delete['_id']})
         return result
 
     def update(self, item):
