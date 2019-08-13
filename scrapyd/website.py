@@ -75,12 +75,12 @@ class Home(resource.Resource):
 <h1>Scrapyd</h1>
 <p>Available projects: <b>%(projects)s</b></p>
 <ul>
-<li><a href="/jobs">Jobs</a></li>
+<li><a href="./jobs">Jobs</a></li>
 """ % vars
         if self.local_items:
-            s += '<li><a href="/items/">Items</a></li>'
+            s += '<li><a href="./items/">Items</a></li>'
         s += """
-<li><a href="/logs/">Logs</a></li>
+<li><a href="./logs/">Logs</a></li>
 <li><a href="http://scrapyd.readthedocs.org/en/latest/">Documentation</a></li>
 </ul>
 
@@ -201,8 +201,8 @@ class Jobs(resource.Resource):
                 Job=p.job, PID=p.pid,
                 Start=microsec_trunc(p.start_time),
                 Runtime=microsec_trunc(datetime.now() - p.start_time),
-                Log='<a href="/logs/%s/%s/%s.log">Log</a>' % (p.project, p.spider, p.job),
-                Items='<a href="/items/%s/%s/%s.jl">Items</a>' % (p.project, p.spider, p.job),
+                Log='<a href="./logs/%s/%s/%s.log">Log</a>' % (p.project, p.spider, p.job),
+                Items='<a href="./items/%s/%s/%s.jl">Items</a>' % (p.project, p.spider, p.job),
                 Cancel=self.cancel_button(project=p.project, jobid=p.job)
             ))
             for p in self.root.launcher.jobs.get_jobs_runing()
@@ -216,8 +216,8 @@ class Jobs(resource.Resource):
                 Start=microsec_trunc(p.start_time),
                 Runtime=microsec_trunc(p.end_time - p.start_time),
                 Finish=microsec_trunc(p.end_time),
-                Log='<a href="/logs/%s/%s/%s.log">Log</a>' % (p.project, p.spider, p.job),
-                Items='<a href="/items/%s/%s/%s.jl">Items</a>' % (p.project, p.spider, p.job),
+                Log='<a href="./logs/%s/%s/%s.log">Log</a>' % (p.project, p.spider, p.job),
+                Items='<a href="./items/%s/%s/%s.jl">Items</a>' % (p.project, p.spider, p.job),
             ))
             for p in self.root.launcher.jobs.get_jobs_completed()
         )
