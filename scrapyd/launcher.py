@@ -54,10 +54,10 @@ class Launcher(Service):
         env = native_stringify_dict(env, keys_only=False)
         pp = ScrapyProcessProtocol(slot, project, msg['_spider'], \
             msg['_job'], env)
+        self.jobs.insert(pp)
         pp.deferred.addBoth(self._process_finished, slot)
         reactor.spawnProcess(pp, sys.executable, args=args, env=env)
         self.mem_processes[slot] = pp
-        self.jobs.insert(pp)
         self.mem_storage.pop()
 
     def _process_finished(self, _, slot):
@@ -101,9 +101,19 @@ class ScrapyProcessProtocol(protocol.ProcessProtocol):
         self.pid = self.transport.pid
         self.log("Process started: ")
 
+    def errConnectionLost(self):
+        self.log("errConnectionLost! The child closed their stderr: ")
+
+    def processExited(self, reason):
+        if isinstance(status.value, error.ProcessDone):
+            self.log("Process Exited: ")
+        else:
+            self.log("Process died: exitstatus=%r " % status.value.exitCode)
+        self.deferred.callback(self)
+
     def processEnded(self, status):
         if isinstance(status.value, error.ProcessDone):
-            self.log("Process finished: ")
+            self.log("Process Finished: ")
         else:
             self.log("Process died: exitstatus=%r " % status.value.exitCode)
         self.deferred.callback(self)
