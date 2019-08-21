@@ -51,7 +51,7 @@ class Schedule(WsResource):
         if not spider in spiders:
             return {"status": "error", "message": "spider '%s' not found" % spider}
         args['settings'] = settings
-        jobid = args.pop('jobid', uuid.uuid1().hex)
+        jobid = args.pop('jobid', uuid.uuid4().hex)
         args['_job'] = jobid
         self.root.scheduler.schedule(project, spider, priority=priority, **args)
         return {"node_name": self.root.nodename, "status": "ok", "jobid": jobid}
