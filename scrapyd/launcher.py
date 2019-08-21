@@ -26,7 +26,11 @@ class Launcher(Service):
 
     def startService(self):
         for slot in range(self.max_proc):
-            self._wait_for_project(slot)
+            try:
+                self._wait_for_project(slot)
+            except Exception as e:
+                log.msg(format="Error! Unable to spawnProcess: %(error)s", error=e)
+
         log.msg(format='Scrapyd %(version)s started: max_proc=%(max_proc)r, runner=%(runner)r',
                 version=__version__, max_proc=self.max_proc,
                 runner=self.runner, system='Launcher')
