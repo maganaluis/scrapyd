@@ -104,7 +104,7 @@ class ScrapyProcessProtocol(protocol.ProcessProtocol):
     def errConnectionLost(self):
         self.log("errConnectionLost! The child closed their stderr: ")
 
-    def processExited(self, reason):
+    def processExited(self, status):
         if isinstance(status.value, error.ProcessDone):
             self.log("Process Exited: ")
         else:
