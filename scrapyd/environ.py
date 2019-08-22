@@ -56,8 +56,11 @@ class Environment(object):
             message['_spider'])
         if not os.path.exists(logsdir):
             os.makedirs(logsdir)
-        to_delete = sorted((os.path.join(logsdir, x) for x in \
-            os.listdir(logsdir)), key=os.path.getmtime)[:-self.jobs_to_keep]
-        for x in to_delete:
-            os.remove(x)
+        try:
+            to_delete = sorted((os.path.join(logsdir, x) for x in \
+                os.listdir(logsdir)), key=os.path.getmtime)[:-self.jobs_to_keep]
+            for x in to_delete:
+                os.remove(x)
+        except FileNotFoundError:
+            pass # assume that it was already executed
         return os.path.join(logsdir, "%s.%s" % (message['_job'], ext))
