@@ -8,6 +8,7 @@ class JobItem(object):
         self.spider = item['spider']
         self.job = item['id']
         self.pid = item['pid']
+        self.nodename = item['nodename']
         self.start_time = item['start_time']
         self.end_time = item['end_time']
 
@@ -58,6 +59,7 @@ class MongoDBJobs(MongoConnector):
             "spider": item.spider,
             "id": item.job,
             "pid": item.pid,
+            "nodename": item.nodename,
             "start_time": item.start_time,
             "end_time": item.end_time
         })
@@ -75,6 +77,7 @@ class MongoDBJobs(MongoConnector):
             "spider": item.spider,
             "id": item.job,
             "pid": item.pid,
+            "nodename": item.nodename,
             "start_time": item.start_time,
             "end_time": item.end_time
         }}, upsert=True)

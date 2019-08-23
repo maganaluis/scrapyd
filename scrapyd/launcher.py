@@ -1,7 +1,7 @@
 import sys
 from datetime import datetime
 from multiprocessing import cpu_count
-
+import socket
 from twisted.internet import reactor, defer, protocol, error
 from twisted.application.service import Service
 from twisted.python import log
@@ -54,10 +54,10 @@ class Launcher(Service):
         env = native_stringify_dict(env, keys_only=False)
         pp = ScrapyProcessProtocol(slot, project, msg['_spider'], \
             msg['_job'], env)
+        self.jobs.insert(pp)
         pp.deferred.addBoth(self._process_finished, slot)
         reactor.spawnProcess(pp, sys.executable, args=args, env=env)
         self.mem_processes[slot] = pp
-        self.jobs.insert(pp)
         self.mem_storage.pop()
 
     def _process_finished(self, _, slot):
@@ -87,6 +87,7 @@ class ScrapyProcessProtocol(protocol.ProcessProtocol):
         self.start_time = datetime.now()
         self.end_time = None
         self.env = env
+        self.nodename = socket.gethostname()
         self.logfile = env.get('SCRAPY_LOG_FILE')
         self.itemsfile = env.get('SCRAPY_FEED_URI')
         self.deferred = defer.Deferred()

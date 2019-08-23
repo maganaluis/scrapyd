@@ -134,6 +134,7 @@ class ListJobs(WsResource):
                 "project": s.project,
                 "spider": s.spider,
                 "id": s.job, "pid": s.pid,
+                "nodename": s.nodename,
                 "start_time": str(s.start_time),
             } for s in running if project is None or s.project == project
         ]
@@ -141,6 +142,7 @@ class ListJobs(WsResource):
             {
                 "project": s.project,
                 "spider": s.spider, "id": s.job,
+                "nodename": s.nodename,
                 "start_time": str(s.start_time),
                 "end_time": str(s.end_time)
             } for s in completed
