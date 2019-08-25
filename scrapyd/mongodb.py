@@ -54,7 +54,8 @@ class MongoDBJobs(MongoConnector):
         self.keep = int(keep)
 
     def insert(self, item):
-        result = self.collection.insert_one({
+        result = self.collection.update_one({'id': item.job},
+        {'$set': {
             "project": item.project,
             "spider": item.spider,
             "id": item.job,
@@ -62,7 +63,7 @@ class MongoDBJobs(MongoConnector):
             "nodename": item.nodename,
             "start_time": item.start_time,
             "end_time": item.end_time
-        })
+        }}, upsert=True)
         if len(self) > self.keep:
             to_delete =  self.collection.find_one({}, sort=[
                 ('start_time', pymongo.ASCENDING),
